@@ -1,25 +1,35 @@
 package com.example.android.spoofing_detector;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private Button button12, button13, button14;
+    private Button choose, button13, button14;
+    private TextView chosen_file;
+    private List<String> files = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        button12 = (Button) findViewById(R.id.button12);
-        button12.setOnClickListener(new View.OnClickListener() {
+        chosen_file = (TextView) findViewById(R.id.chosen_file);
+        choose = (Button) findViewById(R.id.choose);
+        choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openMainActivity2();
+                chooseFile(files);
             }
         });
 
@@ -40,9 +50,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void openMainActivity2() {
-        Intent intent = new Intent(this, MainActivity2.class);
-        startActivity(intent);
+    public void chooseFile(List<String> files) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        startActivityForResult(intent, 10);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 10:
+                if (resultCode == RESULT_OK) {
+                    String path = data.getData().getPath();
+                    chosen_file.setText(path);
+                    files.add(path);
+                }
+                break;
+        }
     }
 
     public void openMainActivity3() {
